@@ -8,9 +8,17 @@ class UserSerializer(ModelSerializer):
         fields = ['name', 'email', 'mobile']
 
 
-class FriendRequestsSerializer(ModelSerializer):
+class FriendRequestsToUserSerializer(ModelSerializer):
     to_user = UserSerializer()
 
     class Meta:
         model = FriendsRequests
-        fields = ['to_user']
+        fields = "__all__"
+
+class FriendRequestsFromUserSerializer(ModelSerializer):
+    from_user = UserSerializer()
+
+    class Meta:
+        model = FriendsRequests
+        fields = "__all__"
+

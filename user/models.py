@@ -20,6 +20,7 @@ class MyUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('The User ID must be set')
+        email = self.normalize_email(email)
         user = self.model(userid=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -39,6 +40,7 @@ class FriendsRequests(CustomModel):
     STATUS_CHOICES = [
         ('CRE', 'Created'),
         ('APP', 'Approved'),
+        ('REJ', 'REJECTED'),
     ]
     from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.DO_NOTHING)
     to_user = models.ForeignKey(User, related_name='to_user', on_delete=models.DO_NOTHING)
