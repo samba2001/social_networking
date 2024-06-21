@@ -80,10 +80,11 @@ class GetUsersFilter(APIView):
 
     def get(self, request):
         try:
-            data = UserManager.get_user_by_name_and_email(request)
+            data, number_of_pages, number_of_records = UserManager.get_user_by_name_and_email(request)
         except Exception as e:
             return Response({'result': 'Error', 'data': str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response({'result': 'success', 'data': data}, status.HTTP_200_OK)
+        return Response({'result': 'success', 'data': data, 'number_of_pages': number_of_pages,
+                         "number_of_records": number_of_records}, status.HTTP_200_OK)
 
 
 class DeleteRejectFriendReq(APIView):

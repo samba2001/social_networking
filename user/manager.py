@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from .serializers import FriendRequestsFromUserSerializer, FriendRequestsToUserSerializer, UserSerializer
 from django.db.models import Q, Prefetch
 from datetime import datetime, timezone
+from utils.pagination import custom_paginator
 
 
 class UserManager:
@@ -40,8 +41,9 @@ class UserManager:
         if data.get('name'):
             query |= Q(name__icontains=data.get('name'))
         data = User.objects.filter(query)
+        data, number_of_pages, count_of_records = custom_paginator(request.query_params, data)
         data = UserSerializer(data, many=True).data
-        return data
+        return data, number_of_pages, count_of_records
 
 
 class FriendRequestsManager:
@@ -88,9 +90,9 @@ class FriendRequestsManager:
     @staticmethod
     def get_friend_requests(request, mode='from'):
         if mode == 'from':
-            from_you = FriendsRequests.all_objects.filter(from_user__email=request.user.email)
+            from_you = FriendsRequests.all_objects.filter(from_user__email=request.user.email.lower(), status='CRE')
             return FriendRequestsToUserSerializer(from_you, many=True).data,
-        to_you = FriendsRequests.all_objects.filter(to_user__email=request.user.email.lower())
+        to_you = FriendsRequests.all_objects.filter(to_user__email=request.user.email.lower(), status='CRE')
         return FriendRequestsFromUserSerializer(to_you,
                                                 many=True).data
 
@@ -106,10 +108,11 @@ class FriendRequestsManager:
 
     @staticmethod
     def get_friends(request):
-        prefetch = Prefetch('from_user',
-                            FriendsRequests.all_objects.filter(
-                                Q(Q(from_user__id=request.user.id) | Q(to_user__id=request.user.id)) & Q(
-                                    status='CRE')))
-
-        users = User.all_objects.prefetch_related(prefetch).filter()
+        from_user_id = FriendsRequests.all_objects.filter(
+            Q(from_user__id=request.user.id) & Q(status='APP')).values_list('from_user_id', flat=True)
+        to_user_id = FriendsRequests.all_objects.filter(Q(to_user__id=request.user.id) & Q(status='APP')).values_list(
+            'to_user_id', flat=True)
+        from_user_id = list(from_user_id)
+        from_user_id.extend(list(to_user_id))
+        users = User.all_objects.filter(id__in=from_user_id)
         return UserSerializer(users, many=True).data
