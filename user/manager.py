@@ -10,7 +10,7 @@ class UserManager:
     @staticmethod
     def login_user(request):
         data = request.data
-        user = User.objects.get(email__iexact=data.get('email'))
+        user = User.objects.filter(email__iexact=data.get('email').lower())
         if not user:
             raise Exception('User does not exists')
         user = authenticate(request, email=data.get('email').lower(), password=data.get('password'))
