@@ -1,6 +1,6 @@
-from .models import User
+from .models import User, FriendsRequests
 from django.contrib.auth import authenticate, login, logout
-
+from .serializers import FriendRequestsSerializer
 
 class UserManager:
     @staticmethod
@@ -26,3 +26,22 @@ class UserManager:
         )
         temp = User.objects.all()
         user.save()
+
+
+class FriendRequestsManager:
+    @staticmethod
+    def create_friend_req(request):
+        data = request.data
+        to_user = User.objects.get(email=data.get('email'))
+        if not to_user:
+            raise Exception('requested user does not exist')
+        if request.user.email == data.get('email'):
+            raise Exception('from user and to user cannot be same')
+        friendrequest = FriendsRequests(from_user=request.user, to_user=to_user)
+        friendrequest.save()
+        print(friendrequest)
+
+    @staticmethod
+    def get_friend_requests(request):
+        data = FriendsRequests.all_objects.filter(from_user__email=request.user.email)
+        return FriendRequestsSerializer(data, many=True).data

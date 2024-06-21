@@ -33,3 +33,13 @@ class User(AbstractBaseUser, CustomModel):
     password = models.CharField(max_length=30)
     USERNAME_FIELD = 'email'
     objects = MyUserManager()
+
+
+class FriendsRequests(CustomModel):
+    STATUS_CHOICES = [
+        ('CRE', 'Created'),
+        ('APP', 'Approved'),
+    ]
+    from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.DO_NOTHING)
+    to_user = models.ForeignKey(User, related_name='to_user', on_delete=models.DO_NOTHING)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=3, default='CRE')
