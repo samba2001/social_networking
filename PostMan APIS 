@@ -1,0 +1,30 @@
+To signup use this data format POST
+http://127.0.0.1:8001/lsignup/
+{ "email":"sambauser2@gmail.com", "name":"samba reddy", "password":"Dad@1972"
+}
+to login use this format POST
+http://127.0.0.1:8001/login/
+{ "email":"Tharun@gmail.com", "password":"Dad@1972"}
+get users by name or email
+to get friends GET
+http://127.0.0.1:8001/get-users-filter/
+query_params :
+name , mail, pageNumber
+Accept friend req POST
+http://127.0.0.1:8001/create-friend-req/
+{"email":"Tharun@gmail.com"}
+Accept friend req POST
+http://127.0.0.1:8001/create-friend-req/
+{"id":"2"}
+get friend requests created by you GET
+http://127.0.0.1:8001/get-your-friend-req/
+get friend requests invites to you GET
+http://127.0.0.1:8001/'get-friend-req-invites/'
+reject/detete friend req POST
+http://127.0.0.1:8001/delete-reject-friend-req/
+{"id":"2"}
+get friend req GET
+http://127.0.0.1:8001/get-friends/
+{"id":"2"}
+
+
