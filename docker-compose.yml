@@ -1,10 +1,33 @@
-version: '3.4'
+version: '3.8'
 
 services:
-  socialnetworking:
-    image: socialnetworking
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'medplus123'
+      MYSQL_DATABASE: 'social_networking'
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: 'medplus123'
     ports:
-      - 8000:8000
+      - '3306:3306'
+    volumes:
+      - db_data:/var/lib/mysql
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=social_networking
+      - DB_USER=root
+      - DB_PASSWORD=medplus123
+
+volumes:
+  db_data:
